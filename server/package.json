@@ -1,0 +1,17 @@
+{
+  "name": "quotes-db-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "Anton",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "pg": "^8.12.0",
+    "sequelize": "^6.37.3"
+  }
+}
