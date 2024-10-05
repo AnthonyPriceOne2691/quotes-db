@@ -1,13 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
-const Quote = require('../models/quote');
-const Category = require('../models/category');
-const sequelize = require('../models');
+const Quote = require('../../models/Quote');
+const Category = require('../../models/Category');
+const sequelize = require('../../config/database');
 
 const CSV_FILENAME = path.resolve(__dirname, '../data/quotes.csv');
-const BATCH_SIZE = 2000;
-const BATCH_TIMEOUT = 50000;
+const CSV_IMPORT_BATCH_SIZE = process.env.CSV_IMPORT_BATCH_SIZE || 2000;
+const CSV_IMPORT_BATCH_TIMEOUT = process.env.CSV_IMPORT_BATCH_TIMEOUT || 50000;
 
 function validateAndSplitCategories(categoriesStr) {
   const categories = categoriesStr.split(', ');
@@ -39,9 +39,9 @@ async function importQuotes() {
       .on('data', async (row) => {
         // 0. Batch processing. Pause stream after specific amount of rows
         rowIndex += 1;
-        if (rowIndex % BATCH_SIZE === 0) {
+        if (rowIndex % CSV_IMPORT_BATCH_SIZE === 0) {
           console.log('Paused', rowIndex);
-          pauseStream(stream, BATCH_TIMEOUT);
+          pauseStream(stream, CSV_IMPORT_BATCH_TIMEOUT);
         }
 
         // 1. Validate row. If not valid -> End

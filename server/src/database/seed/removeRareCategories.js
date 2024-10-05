@@ -1,9 +1,9 @@
 // Remove from the DB all categories which appear in one or two quotes
 const { QueryTypes } = require('sequelize');
-const sequelize = require('../models');
-const Category = require('../models/category');
-const Quote = require('../models/quote');
-const QuoteCategory = require('../models/quoteCategory');
+const sequelize = require('../../config/database');
+const Category = require('../../models/Category');
+const Quote = require('../../models/Quote');
+const QuoteCategory = require('../../models/QuoteCategory');
 
 async function removeRareCategories() {
   try {

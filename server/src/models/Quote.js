@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./index');
-const QuoteCategory = require('./quoteCategory');
-const Category = require('./category');
+const sequelize = require('../config/database');
+const QuoteCategory = require('./QuoteCategory');
+const Category = require('./Category');
 
 const Quote = sequelize.define('Quote', {
   text: {
