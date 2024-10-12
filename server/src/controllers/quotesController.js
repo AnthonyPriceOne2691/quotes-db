@@ -1,10 +1,25 @@
 const Quote = require('../models/Quote');
+const Category = require('../models/Category');
+
+const attributes = { exclude: ['createdAt', 'updatedAt'] };
+
+const includeCategoryConfig = {
+  model: Category,
+  attributes: ['name'],
+  through: { attributes: [] },
+};
 
 const getAllQuotes = async (req, res) => {
+  const limit = req.query.limit || 5;
+  const offset = req.query.offset || 0;
+
   try {
     const quotes = await Quote.findAll({
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
-      limit: 10,
+      attributes,
+      limit,
+      offset,
+      order: [['id', 'ASC']],
+      include: includeCategoryConfig,
     });
     res.json(quotes);
   } catch (err) {
@@ -14,18 +29,19 @@ const getAllQuotes = async (req, res) => {
 
 const getQuoteById = async (req, res) => {
   const quoteId = req.params.id;
-  if (isNaN(quoteId)) {
-    return res
-      .status(400)
-      .json({ message: `Invalid quote ID ${quoteId}: must be a number` });
-  }
-  const quote = await Quote.findByPk(quoteId, {
-    attributes: { exclude: ['createdAt', 'updatedAt'] },
-  });
-  if (quote) {
-    res.json(quote);
-  } else {
-    res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
+
+  try {
+    const quote = await Quote.findByPk(quoteId, {
+      attributes,
+      include: includeCategoryConfig,
+    });
+    if (quote) {
+      res.json(quote);
+    } else {
+      res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
+    }
+  } catch (error) {
+    res.status(500).json({ message: err.message });
   }
 };
 
