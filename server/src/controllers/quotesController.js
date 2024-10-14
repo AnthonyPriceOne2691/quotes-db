@@ -1,5 +1,6 @@
 const Quote = require('../models/Quote');
 const Category = require('../models/Category');
+const { Op } = require('sequelize');
 
 const attributes = { exclude: ['createdAt', 'updatedAt'] };
 
@@ -10,8 +11,19 @@ const includeCategoryConfig = {
 };
 
 const getAllQuotes = async (req, res) => {
-  const limit = req.query.limit || 5;
-  const offset = req.query.offset || 0;
+  const { limit = 5, offset = 0, author, text, category } = req.query;
+  const whereClause = {};
+
+  if (author) {
+    whereClause.author = {
+      [Op.iLike]: `%${author}%`,
+    };
+  }
+  if (text) {
+    whereClause.text = {
+      [Op.iLike]: `%${text}%`,
+    };
+  }
 
   try {
     const quotes = await Quote.findAll({
@@ -19,9 +31,25 @@ const getAllQuotes = async (req, res) => {
       limit,
       offset,
       order: [['id', 'ASC']],
-      include: includeCategoryConfig,
+      include: {
+        ...includeCategoryConfig,
+        where: category ? { name: category } : {},
+      },
+      where: whereClause,
     });
-    res.json(quotes);
+
+    if (!category) {
+      res.json(quotes);
+    } else {
+      const quotesIds = quotes.map((quote) => quote.id);
+      const quotesByIds = await Quote.findAll({
+        attributes,
+        order: [['id', 'ASC']],
+        include: includeCategoryConfig,
+        where: { id: quotesIds },
+      });
+      res.json(quotesByIds);
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

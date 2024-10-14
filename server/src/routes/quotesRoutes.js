@@ -4,12 +4,26 @@ const validationErrorHandler = require('../middlewares/validationErrorHandler');
 const router = express.Router();
 const quotesController = require('../controllers/quotesController');
 
+const getAllQuotesValidators = [
+  query('limit').optional().trim().isInt({ min: 1, max: 50 }),
+  query('offset').optional().trim().isInt({ min: 0 }),
+  query('author').optional().trim().escape(),
+  query('text').optional().trim().escape(),
+  query('category')
+    .optional()
+    .trim()
+    .escape()
+    .custom((value) => {
+      const regex = /^[a-z\-]+$/;
+      return regex.test(value)
+        ? Promise.resolve()
+        : Promise.reject('Categories can only contain letters and dashes');
+    }),
+];
+
 router.get(
   '/',
-  [
-    query('limit').optional().trim().isInt({ min: 1, max: 50 }),
-    query('offset').optional().trim().isInt({ min: 0 }),
-  ],
+  getAllQuotesValidators,
   validationErrorHandler,
   quotesController.getAllQuotes
 );
