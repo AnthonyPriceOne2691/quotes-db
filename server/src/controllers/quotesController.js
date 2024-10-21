@@ -1,10 +1,24 @@
-const { findQuotes, findSingleQuote } = require('../services/quotesService');
+const {
+  findQuotes,
+  findSingleQuote,
+  findRandomQuotes,
+} = require('../services/quotesService');
 
 const getAllQuotes = async (req, res) => {
   const { limit = 5, offset = 0, author, text, category } = req.query;
 
   try {
     const quotes = await findQuotes({ limit, offset, author, text, category });
+    res.json(quotes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getRandomQuotes = async (req, res) => {
+  const { limit = 3 } = req.query;
+  try {
+    const quotes = await findRandomQuotes(limit);
     res.json(quotes);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -25,4 +39,4 @@ const getQuoteById = async (req, res) => {
   }
 };
 
-module.exports = { getAllQuotes, getQuoteById };
+module.exports = { getAllQuotes, getQuoteById, getRandomQuotes };

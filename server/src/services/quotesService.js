@@ -1,6 +1,7 @@
 const Quote = require('../models/Quote');
 const Category = require('../models/Category');
 const { Op } = require('sequelize');
+const sequelize = require('../config/database');
 
 const attributes = { exclude: ['createdAt', 'updatedAt'] };
 
@@ -45,6 +46,16 @@ const findQuotes = async ({ limit, offset, author, text, category }) => {
   }
 };
 
+const findRandomQuotes = async (limit) => {
+  const quotes = await Quote.findAll({
+    attributes,
+    limit,
+    order: sequelize.random(),
+    include: includeCategoryConfig,
+  });
+  return quotes;
+};
+
 const findSingleQuote = async (id) => {
   const quote = await Quote.findByPk(id, {
     attributes,
@@ -53,4 +64,4 @@ const findSingleQuote = async (id) => {
   return quote;
 };
 
-module.exports = { findQuotes, findSingleQuote };
+module.exports = { findQuotes, findSingleQuote, findRandomQuotes };

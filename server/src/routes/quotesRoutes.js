@@ -29,6 +29,13 @@ router.get(
 );
 
 router.get(
+  '/random',
+  [query('limit').optional().trim().isInt({ min: 1, max: 20 })],
+  validationErrorHandler,
+  quotesController.getRandomQuotes
+);
+
+router.get(
   '/:id',
   [param('id').trim().isInt({ min: 1 })],
   validationErrorHandler,
