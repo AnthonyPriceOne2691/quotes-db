@@ -1,11 +1,12 @@
-const Category = require('../models/Category');
+const {
+  findCategories,
+  findSingleCategory,
+} = require('../services/categoriesService');
 
 const getAllCategories = async (req, res) => {
+  const { limit = 10, offset = 0, name } = req.query;
   try {
-    const categories = await Category.findAll({
-      limit: 10,
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
-    });
+    const categories = await findCategories({ limit, offset, name });
     res.json(categories);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -14,14 +15,7 @@ const getAllCategories = async (req, res) => {
 
 const getCategoryById = async (req, res) => {
   const categoryId = req.params.id;
-  if (isNaN(categoryId)) {
-    return res
-      .status(400)
-      .json({ message: `Invalid quote ID ${categoryId}: must be a number` });
-  }
-  const category = await Category.findByPk(categoryId, {
-    attributes: { exclude: ['createdAt', 'updatedAt'] },
-  });
+  const category = await findSingleCategory(categoryId);
   if (category) {
     res.json(category);
   } else {
