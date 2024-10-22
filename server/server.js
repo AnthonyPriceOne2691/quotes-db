@@ -1,8 +1,19 @@
 const app = require('./src/app');
 require('dotenv').config();
+const databaseInit = require('./src/config/databaseinit');
 
-const port = process.env.PORT || 3000;
+const startServer = async () => {
+  try {
+    await databaseInit();
 
-app.listen(port, () => {
-  console.log(`Quotes API server is listening on the port ${port}`);
-});
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Quotes API server is listening on the port ${port}`);
+    });
+  } catch (error) {
+    console.error('Unable to sync database', error);
+    process.exit(1);
+  }
+};
+
+startServer();

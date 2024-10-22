@@ -64,4 +64,24 @@ const findSingleQuote = async (id) => {
   return quote;
 };
 
-module.exports = { findQuotes, findSingleQuote, findRandomQuotes };
+const createQuote = async ({ text, author, categories }) => {
+  const createdQuoteId = await sequelize.transaction(async (t) => {
+    const quote = await Quote.create({ text, author }, { transaction: t });
+
+    const categoryInstances = await Promise.all(
+      categories.map((name) =>
+        Category.findOrCreate({
+          where: { name },
+          transaction: t,
+        }).then(([category]) => category)
+      )
+    );
+
+    await quote.setCategories(categoryInstances, { transaction: t });
+
+    return quote.id;
+  });
+  return await findSingleQuote(createdQuoteId);
+};
+
+module.exports = { findQuotes, findSingleQuote, findRandomQuotes, createQuote };
