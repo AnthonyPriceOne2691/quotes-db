@@ -4,7 +4,7 @@ const {
 } = require('../services/categoriesService');
 const handleServerErrors = require('../utils/handleServerErrors');
 
-const getAllCategories = handleServerErrors(async (req, res) => {
+const getCategories = handleServerErrors(async (req, res) => {
   const { limit = 10, offset = 0, name } = req.query;
   const categories = await findCategories({ limit, offset, name });
   res.json(categories);
@@ -22,4 +22,4 @@ const getCategoryById = handleServerErrors(async (req, res) => {
   }
 });
 
-module.exports = { getAllCategories, getCategoryById };
+module.exports = { getCategories, getCategoryById };

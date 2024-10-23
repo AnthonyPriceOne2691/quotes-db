@@ -1,34 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { query, param } = require('express-validator');
 const validationErrorHandler = require('../middlewares/validationErrorHandler');
 const categoriesController = require('../controllers/categoriesController');
-
-const getAllCategoriesValidators = [
-  query('limit').optional().trim().isInt({ min: 1, max: 50 }),
-  query('offset').optional().trim().isInt({ min: 0 }),
-  query('name')
-    .optional()
-    .trim()
-    .escape()
-    .custom((value) => {
-      const regex = /^[a-z\-]+$/i;
-      return regex.test(value)
-        ? Promise.resolve()
-        : Promise.reject('Categories can only contain letters and dashes');
-    }),
-];
+const {
+  getCategoriesValidators,
+  getSingleCategoryValidators,
+} = require('../middlewares/categoryValidators');
 
 router.get(
   '/',
-  getAllCategoriesValidators,
+  getCategoriesValidators,
   validationErrorHandler,
-  categoriesController.getAllCategories
+  categoriesController.getCategories
 );
 
 router.get(
   '/:id',
-  [param('id').trim().isInt({ min: 1 })],
+  getSingleCategoryValidators,
   validationErrorHandler,
   categoriesController.getCategoryById
 );

@@ -7,7 +7,7 @@ const {
 } = require('../services/quotesService');
 const handleServerErrors = require('../utils/handleServerErrors');
 
-const getAllQuotes = handleServerErrors(async (req, res) => {
+const getQuotes = handleServerErrors(async (req, res) => {
   const { limit = 5, offset = 0, author, text, category } = req.query;
   const quotes = await findQuotes({ limit, offset, author, text, category });
   res.json(quotes);
@@ -46,7 +46,7 @@ const postQuote = handleServerErrors(async (req, res) => {
 });
 
 module.exports = {
-  getAllQuotes,
+  getQuotes,
   getQuoteById,
   getRandomQuotes,
   postQuote,

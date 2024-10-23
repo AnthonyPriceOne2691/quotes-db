@@ -3,7 +3,7 @@ const validationErrorHandler = require('../middlewares/validationErrorHandler');
 const router = express.Router();
 const quotesController = require('../controllers/quotesController');
 const {
-  getAllQuotesValidators,
+  getQuotesValidators,
   getRandomQuotesValidators,
   getSingleQuoteValidators,
   deleteSingleQuoteValidators,
@@ -12,9 +12,9 @@ const {
 
 router.get(
   '/',
-  getAllQuotesValidators,
+  getQuotesValidators,
   validationErrorHandler,
-  quotesController.getAllQuotes
+  quotesController.getQuotes
 );
 
 router.post(
