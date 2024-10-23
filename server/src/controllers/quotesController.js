@@ -5,66 +5,45 @@ const {
   createQuote,
   deleteSingleQuote,
 } = require('../services/quotesService');
+const handleServerErrors = require('../utils/handleServerErrors');
 
-const getAllQuotes = async (req, res) => {
+const getAllQuotes = handleServerErrors(async (req, res) => {
   const { limit = 5, offset = 0, author, text, category } = req.query;
+  const quotes = await findQuotes({ limit, offset, author, text, category });
+  res.json(quotes);
+});
 
-  try {
-    const quotes = await findQuotes({ limit, offset, author, text, category });
-    res.json(quotes);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-const getRandomQuotes = async (req, res) => {
+const getRandomQuotes = handleServerErrors(async (req, res) => {
   const { limit = 3 } = req.query;
-  try {
-    const quotes = await findRandomQuotes(limit);
-    res.json(quotes);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+  const quotes = await findRandomQuotes(limit);
+  res.json(quotes);
+});
 
-const getQuoteById = async (req, res) => {
+const getQuoteById = handleServerErrors(async (req, res) => {
   const quoteId = req.params.id;
-  try {
-    const quote = await findSingleQuote(quoteId);
-    if (quote) {
-      res.json(quote);
-    } else {
-      res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
-    }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  const quote = await findSingleQuote(quoteId);
+  if (quote) {
+    res.json(quote);
+  } else {
+    res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
   }
-};
+});
 
-const deleteQuoteById = async (req, res) => {
+const deleteQuoteById = handleServerErrors(async (req, res) => {
   const quoteId = req.params.id;
-  try {
-    const deletedQuoteId = await deleteSingleQuote(quoteId);
-    if (deletedQuoteId) {
-      res.status(204).send();
-    } else {
-      res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
-    }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  const deletedQuoteId = await deleteSingleQuote(quoteId);
+  if (deletedQuoteId) {
+    res.status(204).send();
+  } else {
+    res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
   }
-};
+});
 
-const postQuote = async (req, res) => {
+const postQuote = handleServerErrors(async (req, res) => {
   const { text, author, categories } = req.body;
-
-  try {
-    const quote = await createQuote({ text, author, categories });
-    res.status(200).json(quote);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+  const quote = await createQuote({ text, author, categories });
+  res.status(200).json(quote);
+});
 
 module.exports = {
   getAllQuotes,
