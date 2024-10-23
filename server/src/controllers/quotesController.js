@@ -3,6 +3,7 @@ const {
   findSingleQuote,
   findRandomQuotes,
   createQuote,
+  deleteSingleQuote,
 } = require('../services/quotesService');
 
 const getAllQuotes = async (req, res) => {
@@ -40,6 +41,20 @@ const getQuoteById = async (req, res) => {
   }
 };
 
+const deleteQuoteById = async (req, res) => {
+  const quoteId = req.params.id;
+  try {
+    const deletedQuoteId = await deleteSingleQuote(quoteId);
+    if (deletedQuoteId) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 const postQuote = async (req, res) => {
   const { text, author, categories } = req.body;
 
@@ -51,4 +66,10 @@ const postQuote = async (req, res) => {
   }
 };
 
-module.exports = { getAllQuotes, getQuoteById, getRandomQuotes, postQuote };
+module.exports = {
+  getAllQuotes,
+  getQuoteById,
+  getRandomQuotes,
+  postQuote,
+  deleteQuoteById,
+};

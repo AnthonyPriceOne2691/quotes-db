@@ -6,6 +6,7 @@ const {
   getAllQuotesValidators,
   getRandomQuotesValidators,
   getSingleQuoteValidators,
+  deleteSingleQuoteValidators,
   postQuotesValidators,
 } = require('../middlewares/quoteValidators');
 
@@ -35,6 +36,13 @@ router.get(
   getSingleQuoteValidators,
   validationErrorHandler,
   quotesController.getQuoteById
+);
+
+router.delete(
+  '/:id',
+  deleteSingleQuoteValidators,
+  validationErrorHandler,
+  quotesController.deleteQuoteById
 );
 
 module.exports = router;

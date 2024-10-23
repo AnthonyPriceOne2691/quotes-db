@@ -64,6 +64,11 @@ const findSingleQuote = async (id) => {
   return quote;
 };
 
+const deleteSingleQuote = async (id) => {
+  const count = await Quote.destroy({ where: { id } });
+  if (count) return id;
+};
+
 const createQuote = async ({ text, author, categories }) => {
   const createdQuoteId = await sequelize.transaction(async (t) => {
     const quote = await Quote.create({ text, author }, { transaction: t });
@@ -84,4 +89,10 @@ const createQuote = async ({ text, author, categories }) => {
   return await findSingleQuote(createdQuoteId);
 };
 
-module.exports = { findQuotes, findSingleQuote, findRandomQuotes, createQuote };
+module.exports = {
+  findQuotes,
+  findSingleQuote,
+  findRandomQuotes,
+  createQuote,
+  deleteSingleQuote,
+};
