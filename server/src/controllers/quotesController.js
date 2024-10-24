@@ -6,21 +6,21 @@ const {
   deleteSingleQuote,
   modifySingleQuote,
 } = require('../services/quotesService');
-const handleServerErrors = require('../utils/handleServerErrors');
+const asyncErrorHandler = require('../utils/asyncErrorHandler');
 
-const getQuotes = handleServerErrors(async (req, res) => {
+const getQuotes = asyncErrorHandler(async (req, res) => {
   const { limit = 5, offset = 0, author, text, category } = req.query;
   const quotes = await findQuotes({ limit, offset, author, text, category });
   res.json(quotes);
 });
 
-const getRandomQuotes = handleServerErrors(async (req, res) => {
+const getRandomQuotes = asyncErrorHandler(async (req, res) => {
   const { limit = 3 } = req.query;
   const quotes = await findRandomQuotes(limit);
   res.json(quotes);
 });
 
-const getQuoteById = handleServerErrors(async (req, res) => {
+const getQuoteById = asyncErrorHandler(async (req, res) => {
   const quoteId = req.params.id;
   const quote = await findSingleQuote(quoteId);
   if (quote) {
@@ -30,7 +30,7 @@ const getQuoteById = handleServerErrors(async (req, res) => {
   }
 });
 
-const deleteQuoteById = handleServerErrors(async (req, res) => {
+const deleteQuoteById = asyncErrorHandler(async (req, res) => {
   const quoteId = req.params.id;
   const deletedQuoteId = await deleteSingleQuote(quoteId);
   if (deletedQuoteId) {
@@ -40,7 +40,7 @@ const deleteQuoteById = handleServerErrors(async (req, res) => {
   }
 });
 
-const patchQuoteById = handleServerErrors(async (req, res) => {
+const patchQuoteById = asyncErrorHandler(async (req, res) => {
   const quoteId = req.params.id;
   const { text, author, categories } = req.body;
   const updateData = { text, author, categories };
@@ -52,7 +52,7 @@ const patchQuoteById = handleServerErrors(async (req, res) => {
   }
 });
 
-const postQuote = handleServerErrors(async (req, res) => {
+const postQuote = asyncErrorHandler(async (req, res) => {
   const { text, author, categories } = req.body;
   const quote = await createQuote({ text, author, categories });
   res.status(200).json(quote);
