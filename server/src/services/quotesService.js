@@ -64,6 +64,18 @@ const findSingleQuote = async (id) => {
   return quote;
 };
 
+const findOrCreateCategories = async (categoryNames, transaction) => {
+  const categoryInstances = await Promise.all(
+    categoryNames.map((name) =>
+      Category.findOrCreate({
+        where: { name },
+        transaction,
+      }).then(([category]) => category)
+    )
+  );
+  return categoryInstances;
+};
+
 const deleteSingleQuote = async (id) => {
   const count = await Quote.destroy({ where: { id } });
   if (count) return id;
@@ -73,14 +85,7 @@ const createQuote = async ({ text, author, categories }) => {
   const createdQuoteId = await sequelize.transaction(async (t) => {
     const quote = await Quote.create({ text, author }, { transaction: t });
 
-    const categoryInstances = await Promise.all(
-      categories.map((name) =>
-        Category.findOrCreate({
-          where: { name },
-          transaction: t,
-        }).then(([category]) => category)
-      )
-    );
+    const categoryInstances = await findOrCreateCategories(categories, t);
 
     await quote.setCategories(categoryInstances, { transaction: t });
 
@@ -89,10 +94,31 @@ const createQuote = async ({ text, author, categories }) => {
   return await findSingleQuote(createdQuoteId);
 };
 
+const modifySingleQuote = async (id, { text, author, categories }) => {
+  const modifiedQuoteId = await sequelize.transaction(async (t) => {
+    const quote = await Quote.findByPk(id, { transaction: t });
+    if (!quote) {
+      return null;
+    }
+    if (text) quote.text = text;
+    if (author) quote.author = author;
+
+    await quote.save({ transaction: t });
+
+    if (categories) {
+      const categoryInstances = await findOrCreateCategories(categories, t);
+      await quote.setCategories(categoryInstances, { transaction: t });
+    }
+    return quote.id;
+  });
+  return await findSingleQuote(modifiedQuoteId);
+};
+
 module.exports = {
   findQuotes,
   findSingleQuote,
   findRandomQuotes,
   createQuote,
   deleteSingleQuote,
+  modifySingleQuote,
 };

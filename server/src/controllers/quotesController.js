@@ -4,6 +4,7 @@ const {
   findRandomQuotes,
   createQuote,
   deleteSingleQuote,
+  modifySingleQuote,
 } = require('../services/quotesService');
 const handleServerErrors = require('../utils/handleServerErrors');
 
@@ -39,6 +40,18 @@ const deleteQuoteById = handleServerErrors(async (req, res) => {
   }
 });
 
+const patchQuoteById = handleServerErrors(async (req, res) => {
+  const quoteId = req.params.id;
+  const { text, author, categories } = req.body;
+  const updateData = { text, author, categories };
+  const modifiedQuote = await modifySingleQuote(quoteId, updateData);
+  if (modifiedQuote) {
+    res.json(modifiedQuote);
+  } else {
+    res.status(404).json({ message: `Quote with ID ${quoteId} not found` });
+  }
+});
+
 const postQuote = handleServerErrors(async (req, res) => {
   const { text, author, categories } = req.body;
   const quote = await createQuote({ text, author, categories });
@@ -51,4 +64,5 @@ module.exports = {
   getRandomQuotes,
   postQuote,
   deleteQuoteById,
+  patchQuoteById,
 };
