@@ -4,10 +4,12 @@ const csv = require('csv-parser');
 const Quote = require('../../models/Quote');
 const Category = require('../../models/Category');
 const sequelize = require('../../config/database');
+const {
+  CSV_IMPORT_BATCH_SIZE,
+  CSV_IMPORT_BATCH_TIMEOUT,
+} = require('../../config/config');
 
 const CSV_FILENAME = path.resolve(__dirname, '../data/quotes.csv');
-const CSV_IMPORT_BATCH_SIZE = process.env.CSV_IMPORT_BATCH_SIZE || 2000;
-const CSV_IMPORT_BATCH_TIMEOUT = process.env.CSV_IMPORT_BATCH_TIMEOUT || 50000;
 
 function validateAndSplitCategories(categoriesStr) {
   const categories = categoriesStr.split(', ');
