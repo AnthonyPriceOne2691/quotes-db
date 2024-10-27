@@ -1,6 +1,7 @@
 # Filling database with initial data
 
 For both modes (dev and prod) you have to fill DB with initial data. If database is empty than after launching database you have to follow instructions in the `database/seed/README.md` file ti fill database with quotes and categories.
+
 All nesessary database files are located in the `database/data`
 
 ---
@@ -12,6 +13,11 @@ All nesessary database files are located in the `database/data`
 1. Change directory to the `server` folder
 1. Run DB containers using `docker compose up -d`
 
+## Install NPM dependencies
+
+1. Change directory to the `server` folder
+1. Install necessary NPM dependencies `npm install`
+
 ## Run Node.js application in development mode
 
 1. Change directory to the `server` folder
@@ -19,8 +25,8 @@ All nesessary database files are located in the `database/data`
 
 ## Stop application
 
-1. Stop Node.js application
-1. Stop DB containers using `docker compose down -d`
+1. Stop Node.js application using `Ctrl + C` in the terminal
+1. Stop DB containers using `docker compose down`
 
 ---
 
