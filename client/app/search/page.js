@@ -46,6 +46,14 @@ export default function Search() {
     }
   };
 
+  const clearSearch = () => {
+    setText('');
+    setAuthor('');
+    setCategory('');
+    setSearchButtonClicked(false);
+    setQuotes([]);
+  };
+
   const getValidationMessage = (name, value) => {
     if (name === 'text' && value && value.length < 3) {
       return 'Text must be at least 3 characters long.';
@@ -121,9 +129,9 @@ export default function Search() {
         </div>
       </div>
 
-      {/* Search Button */}
-      <div className="text-center mb-6">
+      <div className="flex justify-center mb-6">
         <Button onClick={handleSearch} text="Search" />
+        <Button onClick={clearSearch} text="Clear" variant="secondary" />
       </div>
 
       {quotes.length > 0 ? (
