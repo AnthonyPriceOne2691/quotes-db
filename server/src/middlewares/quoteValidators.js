@@ -2,7 +2,11 @@ const { query, param, body } = require('express-validator');
 const { CATEGORY_NAME_REGEX } = require('./categoryValidators');
 
 const getQuotesValidators = [
-  query('limit').optional().trim().isInt({ min: 1, max: 50 }),
+  query('limit')
+    .optional()
+    .trim()
+    .isInt({ min: 1, max: 50 })
+    .withMessage('Limit must be in range 1...50'),
   query('offset').optional().trim().isInt({ min: 0 }),
   query('author').optional().trim().escape(),
   query('text').optional().trim().escape(),
