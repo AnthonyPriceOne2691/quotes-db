@@ -1,9 +1,6 @@
 export default function Quote({ quote }) {
   return (
-    <div
-      key={quote.id}
-      className="bg-gray-100 dark:bg-gray-800 p-4 shadow-md rounded-lg"
-    >
+    <div className="bg-gray-100 dark:bg-gray-800 p-4 shadow-md rounded-lg">
       <p className="mb-4 text-lg italic text-gray-900 dark:text-gray-100">
         "{quote.text}"
       </p>

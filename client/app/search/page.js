@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import Button from '../../components/Button';
-import Quote from '../../components/Quote';
+import Button from '@components/Button';
+import InputField from '@components/InputField';
+import Quotes from '@components/Quotes';
 
 // Regex for category validation
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
@@ -27,12 +28,12 @@ export default function Search() {
   const [searchSubmitted, setSearchSubmitted] = useState(false);
   const [searchButtonClicked, setSearchButtonClicked] = useState(false);
   const [quotes, setQuotes] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState({});
 
   const handleSearch = async () => {
     setSearchButtonClicked(true);
 
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(validationErrors).length > 0) {
       return;
     }
 
@@ -95,16 +96,37 @@ export default function Search() {
 
     const errorMessage = getValidationMessage(name, value);
 
-    setErrors((prev) => {
-      const newErrors = { ...prev };
-      if (errorMessage) {
-        newErrors[name] = errorMessage;
-      } else {
-        delete newErrors[name]; // Remove the error if there is none
-      }
-      return newErrors;
-    });
+    const newValidationErrors = { ...validationErrors };
+    if (errorMessage) {
+      newValidationErrors[name] = errorMessage;
+    } else {
+      delete newValidationErrors[name]; // Remove the error if there is none
+    }
+
+    setValidationErrors(newValidationErrors);
   };
+
+  const inputFields = [
+    {
+      name: 'text',
+      placeholder: 'Search by text',
+      value: text,
+      error: validationErrors.text,
+    },
+    {
+      name: 'author',
+      placeholder: 'Search by author',
+      value: author,
+      error: validationErrors.author,
+    },
+    {
+      name: 'category',
+      placeholder: 'Search by category',
+      value: category,
+      error: validationErrors.category,
+    },
+    { name: 'limit', placeholder: 'limit', value: limit || '', error: null },
+  ];
 
   return (
     <div className="p-4">
@@ -113,51 +135,16 @@ export default function Search() {
       </h1>
 
       <div className="text-xl grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_0.3fr] gap-4 mb-6">
-        <div className="w-full">
-          <input
-            type="text"
-            placeholder="Search by text"
-            value={text}
-            onChange={(e) => handleInputChange('text', e.target.value)}
-            className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+        {inputFields.map(({ name, placeholder, value, error }) => (
+          <InputField
+            key={name}
+            placeholder={placeholder}
+            value={value}
+            onChange={(e) => handleInputChange(name, e.target.value)}
+            error={error}
+            showError={searchButtonClicked}
           />
-          {searchButtonClicked && errors.text && (
-            <p className="text-red-500 text-base">{errors.text}</p>
-          )}
-        </div>
-        <div className="w-full">
-          <input
-            type="text"
-            placeholder="Search by author"
-            value={author}
-            onChange={(e) => handleInputChange('author', e.target.value)}
-            className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-          />
-          {searchButtonClicked && errors.author && (
-            <p className="text-red-500 text-base">{errors.author}</p>
-          )}
-        </div>
-        <div className="w-full">
-          <input
-            type="text"
-            placeholder="Search by category"
-            value={category}
-            onChange={(e) => handleInputChange('category', e.target.value)}
-            className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-          />
-          {searchButtonClicked && errors.category && (
-            <p className="text-red-500 text-base">{errors.category}</p>
-          )}
-        </div>
-        <div className="w-full">
-          <input
-            type="text"
-            placeholder="Limit"
-            value={limit}
-            onChange={(e) => handleInputChange('limit', e.target.value)}
-            className="p-2 w-full border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-          />
-        </div>
+        ))}
       </div>
 
       <div className="flex justify-center mb-6">
@@ -166,11 +153,7 @@ export default function Search() {
       </div>
 
       {quotes.length > 0 ? (
-        <div className="pt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quotes.map((quote) => (
-            <Quote key={quote.id} quote={quote} />
-          ))}
-        </div>
+        <Quotes quotes={quotes} />
       ) : (
         searchSubmitted && (
           <p className="text-2xl pt-10 text-center text-gray-600 dark:text-gray-400">

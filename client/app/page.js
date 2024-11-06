@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Button from '@/components/Button';
-import Quote from '@/components/Quote';
 import { toast } from 'react-toastify';
+import Button from '@components/Button';
+import Quotes from '@components/Quotes';
 
 const RANDOM_QUOTES_URL = 'http://localhost:3000/quotes/random?limit=10';
 
@@ -32,11 +32,7 @@ export default function Home() {
       </h1>
       <Button onClick={fetchQuotes} text="Get Random Quotes" />
 
-      <div className="pt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {quotes.map((quote) => (
-          <Quote key={quote.id} quote={quote} />
-        ))}
-      </div>
+      <Quotes quotes={quotes} />
     </div>
   );
 }
