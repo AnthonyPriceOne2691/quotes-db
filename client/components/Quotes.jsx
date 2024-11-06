@@ -1,4 +1,4 @@
-import Quote from '@/components/Quote';
+import Quote from '@components/Quote';
 
 export default function Quotes({ quotes }) {
   return (
