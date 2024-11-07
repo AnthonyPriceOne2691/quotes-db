@@ -9,7 +9,19 @@ export default function QuotePage(props) {
   const [quote, setQuote] = useState(null);
   const [isloading, setIsLoading] = useState(true);
 
+  const isValidId = (id) => {
+    const parseId = parseInt(id, 10);
+    return Number.isInteger(parseId) && parseId > 0;
+  };
+
   const fetchQuote = async () => {
+    if (!isValidId(id)) {
+      toast.error(
+        `Invalid quote ID ${id}. It must be an integer greater than 0`
+      );
+      setIsLoading(false);
+      return;
+    }
     try {
       const response = await fetch(`http://localhost:3000/quotes/${id}`);
       const data = await response.json();
@@ -49,7 +61,7 @@ export default function QuotePage(props) {
   return (
     <div>
       <div className="max-w-4xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg dark:bg-gray-800">
-        <h2 className="text 4xl font-bold text-center mb-6 text-violet-900 dark:text-violet-300">
+        <h2 className="text xl md:text-2xl font-bold text-center mb-6 text-violet-900 dark:text-violet-300">
           {quote.text}
         </h2>
         <p className="text-2xl text-center text-gray-600 dark:text-gray-300 mb-4">

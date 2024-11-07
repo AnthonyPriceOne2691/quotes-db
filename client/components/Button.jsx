@@ -4,7 +4,7 @@ export default function Button({ onClick, text, variant = 'primary' }) {
   const variantClasses =
     variant === 'primary'
       ? 'bg-blue-900 text-white focus:ring-violet-600 hover:bg-blue-700'
-      : 'bg-gray-300 text-gray-800 focus:ring-gray-500 hover:bg-gray-100';
+      : 'bg-gray-300 text-gray-800 focus:ring-gray-500 hover:bg-gray-400';
 
   return (
     <div className="text-center m-5">
