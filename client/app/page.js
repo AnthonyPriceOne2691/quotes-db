@@ -7,7 +7,7 @@ import Quotes from '@components/Quotes';
 
 const RANDOM_QUOTES_URL = 'http://localhost:3000/quotes/random?limit=10';
 
-export default function Home() {
+export default function RandomQuotesPage() {
   const [quotes, setQuotes] = useState([]);
 
   const fetchQuotes = async () => {

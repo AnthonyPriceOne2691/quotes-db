@@ -6,6 +6,7 @@ import Button from '@components/Button';
 import { useRouter, useSearchParams } from 'next/navigation';
 import InputField from '@components/InputField';
 import Quotes from '@components/Quotes';
+import { ClipLoader } from 'react-spinners';
 
 // Regex for category validation
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
@@ -40,7 +41,7 @@ const hasValidationErrors = async (response) => {
   }
 };
 
-export default function Search() {
+export default function SearchQuotesPage() {
   const [text, setText] = useState('');
   const [author, setAuthor] = useState('');
   const [category, setCategory] = useState('');
@@ -49,6 +50,7 @@ export default function Search() {
   const [searchButtonClicked, setSearchButtonClicked] = useState(false);
   const [quotes, setQuotes] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,6 +98,7 @@ export default function Search() {
       router.push(`?${query}`);
 
       setSearchSubmitted(true);
+      setIsLoading(true);
       const response = await fetch(`http://localhost:3000/quotes?${query}`);
 
       if (await hasValidationErrors(response)) {
@@ -107,6 +110,8 @@ export default function Search() {
     } catch (error) {
       console.error('Error fetching quotes:', error);
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -196,7 +201,11 @@ export default function Search() {
         <Button onClick={clearSearch} text="Clear" variant="secondary" />
       </div>
 
-      {quotes.length > 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center">
+          <ClipLoader size={60} color="#4A90E2" />
+        </div>
+      ) : quotes.length > 0 ? (
         <Quotes quotes={quotes} />
       ) : (
         searchSubmitted && (
