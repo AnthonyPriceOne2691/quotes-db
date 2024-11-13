@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { ClipLoader } from 'react-spinners';
 import Button from '@components/Button';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '@config/config';
 
 export default function QuotePage(props) {
   const { id } = props.params;
@@ -19,7 +20,7 @@ export default function QuotePage(props) {
   };
 
   const deleteQuote = async () => {
-    const response = await fetch(`http://localhost:3000/quotes/${id}`, {
+    const response = await fetch(`${API_URL}/quotes/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -44,7 +45,7 @@ export default function QuotePage(props) {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:3000/quotes/${id}`);
+      const response = await fetch(`${API_URL}/quotes/${id}`);
       const data = await response.json();
       if (response.status === 404) {
         toast.error(data.message);

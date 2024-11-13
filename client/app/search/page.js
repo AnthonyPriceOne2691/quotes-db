@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import InputField from '@components/InputField';
 import Quotes from '@components/Quotes';
 import { ClipLoader } from 'react-spinners';
+import { API_URL } from '@config/config';
 
 // Regex for category validation
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
@@ -99,7 +100,7 @@ export default function SearchQuotesPage() {
 
       setSearchSubmitted(true);
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3000/quotes?${query}`);
+      const response = await fetch(`${API_URL}/quotes?${query}`);
 
       if (await hasValidationErrors(response)) {
         return;

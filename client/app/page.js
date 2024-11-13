@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Button from '@components/Button';
 import Quotes from '@components/Quotes';
+import { API_URL } from '@config/config';
 
-const RANDOM_QUOTES_URL = 'http://localhost:3000/quotes/random?limit=10';
+const RANDOM_QUOTES_URL = `${API_URL}/quotes/random?limit=10`;
 
 export default function RandomQuotesPage() {
   const [quotes, setQuotes] = useState([]);

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Button from '@components/Button';
 import InputField from '@components/InputField';
 import { toast } from 'react-toastify';
+import { API_URL } from '@config/config';
 
 export default function CreateQuotePage() {
   const [text, setText] = useState('');
@@ -39,7 +40,7 @@ export default function CreateQuotePage() {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/quotes', {
+      const response = await fetch(`${API_URL}/quotes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
