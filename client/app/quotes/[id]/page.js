@@ -3,15 +3,36 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ClipLoader } from 'react-spinners';
+import Button from '@components/Button';
+import { useRouter } from 'next/navigation';
 
 export default function QuotePage(props) {
   const { id } = props.params;
   const [quote, setQuote] = useState(null);
   const [isloading, setIsLoading] = useState(true);
 
+  const router = useRouter();
+
   const isValidId = (id) => {
     const parseId = parseInt(id, 10);
     return Number.isInteger(parseId) && parseId > 0;
+  };
+
+  const deleteQuote = async () => {
+    const response = await fetch(`http://localhost:3000/quotes/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      toast.error(
+        response.status === 404
+          ? `Quote with id ${id} not found`
+          : `Unknown error. Quote with id ${id} was not deleted`
+      );
+      return;
+    }
+
+    toast.success(`Quote with id ${id} was successfully deleted`);
+    setTimeout(() => router.push('/'), 2000);
   };
 
   const fetchQuote = async () => {
@@ -79,6 +100,7 @@ export default function QuotePage(props) {
           ))}
         </div>
       </div>
+      <Button onClick={deleteQuote} text="Delete" variant="danger" />
     </div>
   );
 }
