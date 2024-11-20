@@ -1,37 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@components/Button';
 import InputField from '@components/InputField';
 import { toast } from 'react-toastify';
 import { API_URL } from '@config/config';
+import { isFormValid } from 'app/quotes/utils/validation';
+import { ClipLoader } from 'react-spinners';
 
-export default function CreateQuotePage() {
+export default function EditQuotePage({ params }) {
+  const { id } = params;
   const [text, setText] = useState('');
   const [author, setAuthor] = useState('');
   const [categories, setCategories] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
+  const QUOTE_API_URL = `${API_URL}/quotes/${id}`;
 
-  const isFormValid = () => {
-    const errors = {};
-    if (text.length < 10)
-      errors.text = 'Text must be at least 10 characters long.';
-    if (author.length < 2 || author.length > 255)
-      errors.author = 'Author must be between 2 and 255 characters long.';
-    if (!categories.trim())
-      errors.categories = 'There must be at least one category.';
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+  useEffect(() => {
+    // Fetch the existing quote data
+    const fetchQuote = async () => {
+      try {
+        const response = await fetch(QUOTE_API_URL);
+        if (!response.ok) throw new Error('Failed to load quote data');
+        const data = await response.json();
+        setText(data.text);
+        setAuthor(data.author);
+        setCategories(data.categories.join(', ')); // Assuming categories is an array
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchQuote();
+  }, [id]);
 
   const handleSubmit = async () => {
-    if (!isFormValid()) {
-      return;
-    }
+    if (!isFormValid({ text, author, categories, setValidationErrors })) return;
 
     const payload = {
       text,
@@ -40,33 +49,34 @@ export default function CreateQuotePage() {
     };
 
     try {
-      const response = await fetch(`${API_URL}/quotes`, {
-        method: 'POST',
+      const response = await fetch(QUOTE_API_URL, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create quote.');
-      }
-
+      if (!response.ok) throw new Error('Failed to update quote.');
       const data = await response.json();
-      toast.success('Quote created successfully!');
-
-      // Redirect to the new quote page using the ID of the created quote
-      router.push(`/quotes/${data.id}`);
+      toast.success('Quote updated successfully!');
+      router.push(`/quotes/${id}`);
     } catch (error) {
       toast.error(error.message);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader size={60} color="#4A90E2" />
+      </div>
+    );
+  }
+
   return (
     <div className="p-4">
-      <h1 className="text-3xl mb-6 text-center dark:text-white">
-        Create New Quote
-      </h1>
+      <h1 className="text-3xl mb-6 text-center">Edit Quote</h1>
       <div className="text-xl grid grid-cols-1 gap-4 mx-auto mb-6 md:w-3/4 lg:w-1/2">
         <InputField
           placeholder="Quote text"
@@ -91,7 +101,7 @@ export default function CreateQuotePage() {
         />
       </div>
       <div className="flex justify-center mb-6">
-        <Button onClick={handleSubmit} text="Create" />
+        <Button onClick={handleSubmit} text="Update" />
       </div>
     </div>
   );

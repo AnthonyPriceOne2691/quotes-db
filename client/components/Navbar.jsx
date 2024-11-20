@@ -24,7 +24,7 @@ export default function Navbar() {
             Search
           </Link>
           <Link
-            href="/create"
+            href="/quotes/create"
             className="text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-400"
           >
             Create New
