@@ -6,7 +6,7 @@ import Button from '@components/Button';
 import InputField from '@components/InputField';
 import { toast } from 'react-toastify';
 import { API_URL } from '@config/config';
-import { isFormValid } from 'app/quotes/utils/validation';
+import { isFormValid } from '@utils/validation';
 
 const QUOTES_URL = `${API_URL}/quotes`;
 
