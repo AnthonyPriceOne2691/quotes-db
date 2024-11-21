@@ -1,6 +1,6 @@
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
 
-export const isFormValid = ({
+export const isQuoteFormValid = ({
   text,
   author,
   categories,

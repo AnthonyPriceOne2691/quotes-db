@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from '@components/Button';
-import InputField from '@components/InputField';
 import { toast } from 'react-toastify';
 import { API_URL } from '@config/config';
-import { isFormValid } from '@utils/validation';
+import { isQuoteFormValid } from '@utils/validation';
+import QuoteForm from '@components/QuoteForm';
 
 const QUOTES_URL = `${API_URL}/quotes`;
 
@@ -19,7 +18,7 @@ export default function CreateQuotePage() {
   const router = useRouter();
 
   const handleSubmit = async () => {
-    if (!isFormValid({ text, author, categories, setValidationErrors })) {
+    if (!isQuoteFormValid({ text, author, categories, setValidationErrors })) {
       return;
     }
 
@@ -53,36 +52,16 @@ export default function CreateQuotePage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl mb-6 text-center dark:text-white">
-        Create New Quote
-      </h1>
-      <div className="text-xl grid grid-cols-1 gap-4 mx-auto mb-6 md:w-3/4 lg:w-1/2">
-        <InputField
-          placeholder="Quote text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          error={validationErrors.text}
-          showError={true}
-        />
-        <InputField
-          placeholder="Author"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          error={validationErrors.author}
-          showError={true}
-        />
-        <InputField
-          placeholder="Categories (comma-separated)"
-          value={categories}
-          onChange={(e) => setCategories(e.target.value)}
-          error={validationErrors.categories}
-          showError={true}
-        />
-      </div>
-      <div className="flex justify-center mb-6">
-        <Button onClick={handleSubmit} text="Create" />
-      </div>
-    </div>
+    <QuoteForm
+      text={text}
+      setText={setText}
+      author={author}
+      setAuthor={setAuthor}
+      categories={categories}
+      setCategories={setCategories}
+      validationErrors={validationErrors}
+      handleSubmit={handleSubmit}
+      buttonText="Create"
+    />
   );
 }
