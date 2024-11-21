@@ -8,8 +8,8 @@ import InputField from '@components/InputField';
 import Quotes from '@components/Quotes';
 import { ClipLoader } from 'react-spinners';
 import { API_URL } from '@config/config';
+import { createSearchInputFields } from '@config/inputFields';
 
-// Regex for category validation
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
 
 const createSearchQueryString = ({ text, author, category, limit = 10 }) => {
@@ -23,7 +23,7 @@ const createSearchQueryString = ({ text, author, category, limit = 10 }) => {
   return params.toString();
 };
 
-const hasValidationErrors = async (response) => {
+const hasServerValidationErrorss = async (response) => {
   if (!response.ok) {
     const errorData = await response.json();
     if (!errorData.errors || !Array.isArray(errorData.errors)) {
@@ -102,7 +102,7 @@ export default function SearchQuotesPage() {
       setIsLoading(true);
       const response = await fetch(`${API_URL}/quotes?${query}`);
 
-      if (await hasValidationErrors(response)) {
+      if (await hasServerValidationErrorss(response)) {
         return;
       }
 
@@ -156,27 +156,13 @@ export default function SearchQuotesPage() {
     setValidationErrors(newValidationErrors);
   };
 
-  const inputFields = [
-    {
-      name: 'text',
-      placeholder: 'Search by text',
-      value: text,
-      error: validationErrors.text,
-    },
-    {
-      name: 'author',
-      placeholder: 'Search by author',
-      value: author,
-      error: validationErrors.author,
-    },
-    {
-      name: 'category',
-      placeholder: 'Search by category',
-      value: category,
-      error: validationErrors.category,
-    },
-    { name: 'limit', placeholder: 'limit', value: limit || '', error: null },
-  ];
+  const searchInputFields = createSearchInputFields({
+    text,
+    author,
+    category,
+    limit,
+    validationErrors,
+  });
 
   return (
     <div className="p-4">
@@ -185,7 +171,7 @@ export default function SearchQuotesPage() {
       </h1>
 
       <div className="text-xl grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_0.3fr] gap-4 mb-6">
-        {inputFields.map(({ name, placeholder, value, error }) => (
+        {searchInputFields.map(({ name, placeholder, value, error }) => (
           <InputField
             key={name}
             placeholder={placeholder}
