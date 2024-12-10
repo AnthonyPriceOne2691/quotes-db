@@ -5,8 +5,9 @@ import { toast } from 'react-toastify';
 import { ClipLoader } from 'react-spinners';
 import { useRouter } from 'next/navigation';
 import Button from '@components/Button';
-import { API_URL } from '@config/config';
 import Link from 'next/link';
+import fetcher from '@utils/fetcher';
+import { API_URL } from '@config/config';
 
 export default function QuotePage(props) {
   const { id } = props.params;
@@ -15,6 +16,7 @@ export default function QuotePage(props) {
 
   const router = useRouter();
 
+  const SINGLE_QUOTE_PATH = `quotes/${id}`;
   const SINGLE_QUOTE_API_URL = `${API_URL}/quotes/${id}`;
 
   const isValidId = (id) => {
@@ -23,21 +25,10 @@ export default function QuotePage(props) {
   };
 
   const deleteQuote = async () => {
-    const response = await fetch(SINGLE_QUOTE_API_URL, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      toast.error(
-        response.status === 404
-          ? `Quote with id ${id} was not found`
-          : `Unknown error. Quote with id ${id} was not deleted`
-      );
-      return;
+    if (await fetcher.delete(SINGLE_QUOTE_PATH)) {
+      toast.success(`Quote with id ${id} was successfully deleted`);
+      setTimeout(() => router.push('/'), 2000);
     }
-
-    toast.success(`Quote with id ${id} was successfully deleted`);
-    setTimeout(() => router.push('/'), 2000);
   };
 
   const fetchQuote = async () => {
