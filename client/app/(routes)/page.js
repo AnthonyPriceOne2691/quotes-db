@@ -1,25 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import Button from '@components/Button';
 import Quotes from '@components/Quotes';
-import { API_URL } from '@config/config';
+import fetcher from '@utils/fetcher';
 
-const RANDOM_QUOTES_URL = `${API_URL}/quotes/random?limit=10`;
+const RANDOM_QUOTES_LIMIT = 10;
+const RANDOM_QUOTES_ENDPOINT = `quotes/random`;
 
 export default function RandomQuotesPage() {
   const [quotes, setQuotes] = useState([]);
 
   const fetchQuotes = async () => {
-    try {
-      const response = await fetch(RANDOM_QUOTES_URL);
-      const data = await response.json();
-      setQuotes(data);
-    } catch (error) {
-      toast.error(error.message);
-      console.error('Error fetching quotes', error);
-    }
+    const queryParams = {
+      limit: RANDOM_QUOTES_LIMIT,
+    };
+    const data = await fetcher.get(RANDOM_QUOTES_ENDPOINT, queryParams);
+    if (data) setQuotes(data);
   };
 
   useEffect(() => {
@@ -32,7 +29,6 @@ export default function RandomQuotesPage() {
         Random Quotes
       </h1>
       <Button onClick={fetchQuotes} text="Get Random Quotes" />
-
       <Quotes quotes={quotes} />
     </div>
   );

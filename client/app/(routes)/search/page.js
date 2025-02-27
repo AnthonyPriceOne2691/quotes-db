@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import Button from '@components/Button';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ClipLoader } from 'react-spinners';
+import Button from '@components/Button';
 import InputField from '@components/InputField';
 import Quotes from '@components/Quotes';
-import { ClipLoader } from 'react-spinners';
-import { API_URL } from '@config/config';
 import { createSearchInputFields } from '@config/inputFields';
+import fetcher from '@utils/fetcher';
 
+// Regex for category validation
 const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
+const QUOTES_URL_ENDPOINT = `quotes`;
 
 const createSearchQueryString = ({ text, author, category, limit = 10 }) => {
   const params = new URLSearchParams();
@@ -21,25 +22,6 @@ const createSearchQueryString = ({ text, author, category, limit = 10 }) => {
   if (limit) params.append('limit', limit);
 
   return params.toString();
-};
-
-const hasServerValidationErrorss = async (response) => {
-  if (!response.ok) {
-    const errorData = await response.json();
-    if (!errorData.errors || !Array.isArray(errorData.errors)) {
-      toast.error('Unexpected error occured');
-      return;
-    }
-    const fieldErrors = errorData.errors
-      .filter((err) => err.type === 'field')
-      .map((err) => `${err.msg} (${err.path}, ${err.value})`);
-
-    fieldErrors.forEach((errorMessage) => {
-      toast.error(errorMessage);
-    });
-
-    return true;
-  }
 };
 
 export default function SearchQuotesPage() {
@@ -68,6 +50,7 @@ export default function SearchQuotesPage() {
       initialCategory && setCategory(initialCategory);
       initialLimit && setLimit(initialLimit);
 
+      // Trigger the search immediately with the query params
       handleSearch({
         searchText: initialText,
         searchAuthor: initialAuthor,
@@ -75,7 +58,7 @@ export default function SearchQuotesPage() {
         searchLimit: initialLimit,
       });
     }
-  }, []);
+  }, []); // Run only on the first render
 
   const handleSearch = async ({
     searchText = text,
@@ -86,34 +69,23 @@ export default function SearchQuotesPage() {
     setSearchButtonClicked(true);
 
     if (Object.keys(validationErrors).length > 0) {
-      return;
+      return; // Exit early if there are validation errors
     }
 
-    try {
-      const query = createSearchQueryString({
-        text: searchText,
-        author: searchAuthor,
-        category: searchCategory,
-        limit: searchLimit,
-      });
-      router.push(`?${query}`);
+    const query = createSearchQueryString({
+      text: searchText,
+      author: searchAuthor,
+      category: searchCategory,
+      limit: searchLimit,
+    });
+    // Update the query string in the URL
+    router.push(`?${query}`);
 
-      setSearchSubmitted(true);
-      setIsLoading(true);
-      const response = await fetch(`${API_URL}/quotes?${query}`);
-
-      if (await hasServerValidationErrorss(response)) {
-        return;
-      }
-
-      const data = await response.json();
-      setQuotes(data);
-    } catch (error) {
-      console.error('Error fetching quotes:', error);
-      toast.error(error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    setSearchSubmitted(true);
+    setIsLoading(true);
+    const data = await fetcher.get(`${QUOTES_URL_ENDPOINT}?${query}`);
+    if (data) setQuotes(data);
+    setIsLoading(false);
   };
 
   const clearSearch = () => {
@@ -122,10 +94,14 @@ export default function SearchQuotesPage() {
     setCategory('');
     setLimit();
     setSearchButtonClicked(false);
+    setSearchSubmitted(false);
     setQuotes([]);
     router.push(window.location.pathname);
   };
 
+  // We decided not to validate 'limit' values even though there is server-side validation
+  // limit must be in the range [1...50]
+  // This is done to be able to see Toast notification when server returns validation error
   const getValidationMessage = (name, value) => {
     if (name === 'text' && value && value.length < 3) {
       return 'Text must be at least 3 characters long.';
@@ -145,14 +121,12 @@ export default function SearchQuotesPage() {
     if (name === 'limit') setLimit(value);
 
     const errorMessage = getValidationMessage(name, value);
-
     const newValidationErrors = { ...validationErrors };
     if (errorMessage) {
       newValidationErrors[name] = errorMessage;
     } else {
       delete newValidationErrors[name]; // Remove the error if there is none
     }
-
     setValidationErrors(newValidationErrors);
   };
 
