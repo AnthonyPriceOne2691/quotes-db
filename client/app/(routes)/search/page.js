@@ -8,9 +8,8 @@ import InputField from '@components/InputField';
 import Quotes from '@components/Quotes';
 import { createSearchInputFields } from '@config/inputFields';
 import fetcher from '@utils/fetcher';
+import { getSearchInputValidationMessage } from '@utils/validation';
 
-// Regex for category validation
-const CATEGORY_NAME_REGEX = /^[a-z0-9\-]+$/;
 const QUOTES_URL_ENDPOINT = `quotes`;
 
 const createSearchQueryString = ({ text, author, category, limit = 10 }) => {
@@ -99,28 +98,13 @@ export default function SearchQuotesPage() {
     router.push(window.location.pathname);
   };
 
-  // We decided not to validate 'limit' values even though there is server-side validation
-  // limit must be in the range [1...50]
-  // This is done to be able to see Toast notification when server returns validation error
-  const getValidationMessage = (name, value) => {
-    if (name === 'text' && value && value.length < 3) {
-      return 'Text must be at least 3 characters long.';
-    }
-    if (name === 'author' && value && value.length < 2) {
-      return 'Author must be at least 2 characters long.';
-    }
-    if (name === 'category' && value && !CATEGORY_NAME_REGEX.test(value)) {
-      return 'Category can only contain lowercase letters, numbers, and dashes.';
-    }
-  };
-
   const handleInputChange = (name, value) => {
     if (name === 'text') setText(value);
     if (name === 'author') setAuthor(value);
     if (name === 'category') setCategory(value);
     if (name === 'limit') setLimit(value);
 
-    const errorMessage = getValidationMessage(name, value);
+    const errorMessage = getSearchInputValidationMessage(name, value);
     const newValidationErrors = { ...validationErrors };
     if (errorMessage) {
       newValidationErrors[name] = errorMessage;

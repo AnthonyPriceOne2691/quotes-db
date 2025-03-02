@@ -38,3 +38,19 @@ export const isQuoteFormValid = ({
   setValidationErrors(errors);
   return Object.keys(errors).length === 0;
 };
+
+
+  // We decided not to validate 'limit' values even though there is server-side validation
+  // limit must be in the range [1...50]
+  // This is done to be able to see Toast notification when server returns validation error
+ export const getSearchInputValidationMessage = (name, value) => {
+    if (name === 'text' && value && value.length < 3) {
+      return 'Text must be at least 3 characters long.';
+    }
+    if (name === 'author' && value && value.length < 2) {
+      return 'Author must be at least 2 characters long.';
+    }
+    if (name === 'category' && value && !CATEGORY_NAME_REGEX.test(value)) {
+      return 'Category can only contain lowercase letters, numbers, and dashes.';
+    }
+  };
