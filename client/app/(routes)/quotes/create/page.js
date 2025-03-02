@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { API_URL } from '@config/config';
 import { isQuoteFormValid } from '@utils/validation';
 import QuoteForm from '@components/QuoteForm';
+import fetcher from '@utils/fetcher';
 
-const QUOTES_URL = `${API_URL}/quotes`;
+const QUOTES_URL_ENDPOINT = `quotes`;
 
 export default function CreateQuotePage() {
   const [text, setText] = useState('');
@@ -28,26 +28,11 @@ export default function CreateQuotePage() {
       categories: categories.split(',').map((category) => category.trim()),
     };
 
-    try {
-      const response = await fetch(QUOTES_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create quote.');
-      }
-
-      const data = await response.json();
+    const data = await fetcher.post(QUOTES_URL_ENDPOINT, payload);
+    if (data) {
       toast.success('Quote created successfully!');
-
       // Redirect to the new quote page using the ID of the created quote
       router.push(`/quotes/${data.id}`);
-    } catch (error) {
-      toast.error(error.message);
     }
   };
 
