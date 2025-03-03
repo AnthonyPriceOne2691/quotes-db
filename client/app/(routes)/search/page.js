@@ -11,8 +11,14 @@ import fetcher from '@utils/fetcher';
 import { getSearchInputValidationMessage } from '@utils/validation';
 
 const QUOTES_URL_ENDPOINT = `quotes`;
+const DEFAULT_LIMIT = 10;
 
-const createSearchQueryString = ({ text, author, category, limit = 10 }) => {
+const createSearchQueryString = ({
+  text,
+  author,
+  category,
+  limit = DEFAULT_LIMIT,
+}) => {
   const params = new URLSearchParams();
 
   if (text) params.append('text', text);
@@ -41,13 +47,13 @@ export default function SearchQuotesPage() {
     const initialText = searchParams.get('text') || '';
     const initialAuthor = searchParams.get('author') || '';
     const initialCategory = searchParams.get('category') || '';
-    const initialLimit = searchParams.get('limit');
+    const initialLimit = searchParams.get('limit') || DEFAULT_LIMIT;
 
-    if (initialText || initialAuthor || initialCategory || initialLimit) {
-      initialText && setText(initialText);
-      initialAuthor && setAuthor(initialAuthor);
-      initialCategory && setCategory(initialCategory);
-      initialLimit && setLimit(initialLimit);
+    if (initialText || initialAuthor || initialCategory) {
+      setText(initialText);
+      setAuthor(initialAuthor);
+      setCategory(initialCategory);
+      setLimit(initialLimit);
 
       // Trigger the search immediately with the query params
       handleSearch({
@@ -57,7 +63,7 @@ export default function SearchQuotesPage() {
         searchLimit: initialLimit,
       });
     }
-  }, []); // Run only on the first render
+  }, [searchParams]); // Run on the first render and each time when searchParams changes
 
   const handleSearch = async ({
     searchText = text,
@@ -151,7 +157,7 @@ export default function SearchQuotesPage() {
           <ClipLoader size={60} color="#4A90E2" />
         </div>
       ) : quotes.length > 0 ? (
-        <Quotes quotes={quotes} />
+        <Quotes quotes={quotes} selectedCategory={category} />
       ) : (
         searchSubmitted && (
           <p className="text-2xl pt-10 text-center text-gray-600 dark:text-gray-400">
