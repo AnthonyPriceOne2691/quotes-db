@@ -49,13 +49,18 @@ export default function SearchQuotesPage() {
     const initialCategory = searchParams.get('category') || '';
     const initialLimit = searchParams.get('limit') || DEFAULT_LIMIT;
 
-    if (initialText || initialAuthor || initialCategory) {
+    // Check if initial values are different from current state values
+    const shouldTriggerSearch =
+      initialText !== text ||
+      initialAuthor !== author ||
+      initialCategory !== category;
+
+    if (shouldTriggerSearch) {
       setText(initialText);
       setAuthor(initialAuthor);
       setCategory(initialCategory);
       setLimit(initialLimit);
 
-      // Trigger the search immediately with the query params
       handleSearch({
         searchText: initialText,
         searchAuthor: initialAuthor,
