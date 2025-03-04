@@ -1,7 +1,7 @@
 import Link from 'next/link';
+import CategoryTags from '@components/CategoryTags';
 
 const MAX_VISIBLE_TEXT_LENGTH = 200;
-const MAX_VISIBLE_CATEGORIES = 10;
 
 export default function Quote({ quote, selectedCategory }) {
   return (
@@ -19,22 +19,7 @@ export default function Quote({ quote, selectedCategory }) {
         </p>
       </Link>
 
-      <div className="flex flex-wrap mt-2">
-        {quote.categories.slice(0, MAX_VISIBLE_CATEGORIES).map((category) => (
-          <Link
-            key={category}
-            href={`/search?category=${category}`}
-            className={`${
-              category === selectedCategory ? 'bg-yellow-200' : 'bg-blue-200'
-            } text-lg text-gray-700 dark:text-gray-800 px-2 py-1 rounded-full mr-2 mb-2`}
-          >
-            {category}
-          </Link>
-        ))}
-        {quote.categories.length > MAX_VISIBLE_CATEGORIES && (
-          <span className="text-3xl">...</span>
-        )}
+      <CategoryTags categories={quote.categories} selectedCategory={selectedCategory} />
       </div>
-    </div>
   );
 }

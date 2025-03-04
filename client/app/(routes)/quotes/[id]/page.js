@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import { ClipLoader } from 'react-spinners';
-import { useRouter } from 'next/navigation';
-import Button from '@components/Button';
-import Link from 'next/link';
-import fetcher from '@utils/fetcher';
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { ClipLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
+import Button from "@components/Button";
+import Link from "next/link";
+import fetcher from "@utils/fetcher";
+import CategoryTags from "@components/CategoryTags";
 
 export default function QuotePage(props) {
   const { id } = props.params;
@@ -25,7 +26,7 @@ export default function QuotePage(props) {
   const deleteQuote = async () => {
     if (await fetcher.delete(SINGLE_QUOTE_ENDPOINT)) {
       toast.success(`Quote with id ${id} was successfully deleted`);
-      setTimeout(() => router.push('/'), 2000);
+      setTimeout(() => router.push("/"), 2000);
     }
   };
 
@@ -67,19 +68,10 @@ export default function QuotePage(props) {
         <h2 className="text-xl md:text-2xl font-bold text-center mb-6 text-violet-900 dark:text-violet-300">
           {quote.text}
         </h2>
-        <p className="text-2xl text-center text-gray-600 dark:text-gray-300 mb-4">
+        <p className="text-2xl text-center text-gray-600 dark:text-gray-300 mb-10">
           — {quote.author}
         </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
-          {quote.categories.map((category) => (
-            <span
-              key={category}
-              className="text-base bg-violet-200 text-violet-900 py-2 px-4 rounded-lg dark:bg-violet-700 dark:text-violet-100"
-            >
-              {category}
-            </span>
-          ))}
-        </div>
+        <CategoryTags categories={quote.categories} isSingleQuotePage={true} />
       </div>
       <div className="flex justify-center mb-6">
         <Link href={`/quotes/${quote.id}/edit`}>
